@@ -12,11 +12,10 @@ from tqdm import tqdm
 
 class MealScraper():
     """This class provides functions to scrape the nutritional information from the UCSC dining website"""
-    linkPrefix = "https://nutrition.sa.ucsc.edu/"
-    mainLink = "https://nutrition.sa.ucsc.edu/longmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=40&locationName="
-    datePrefix = "&naFlag=1&WeeksMenus=UCSC+-+This+Week%27s+Menus&dtdate="
+    LINK_PREFIX = "https://nutrition.sa.ucsc.edu/"
+    MAIN_LINK = "https://nutrition.sa.ucsc.edu/longmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=40&locationName="
+    DATE_PREFIX = "&naFlag=1&WeeksMenus=UCSC+-+This+Week%27s+Menus&dtdate="
     OUTPUT_PATH = "server/src/webscraper/output.html"
-    # dates
     
     def __init__(self, location_name: str, meal_num: int, month: int, day: int, year :int):
         urllib3.disable_warnings()
@@ -60,9 +59,9 @@ class MealScraper():
 
     def get_main_link(self):
         """Returns link to main nutrition website"""
-        return ( self.mainLink +
+        return ( self.MAIN_LINK +
                 self.get_dining_hall_link(self.location_name) +
-                self.datePrefix +
+                self.DATE_PREFIX +
                 self.monthString +
                 self.dayString +
                 self.yearString +
@@ -225,7 +224,7 @@ class MealScraper():
 
     def add_prefix(self, string: str):
         """Returns a string with the link prefix prepended to the given string"""
-        return self.linkPrefix + string
+        return self.LINK_PREFIX + string
     
     def scrape_nutrition(self):
         """Scrapes the nutritional info of a given time period from a given UCSC dining hall 
