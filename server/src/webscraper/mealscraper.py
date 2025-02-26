@@ -15,6 +15,7 @@ class MealScraper():
     linkPrefix = "https://nutrition.sa.ucsc.edu/"
     mainLink = "https://nutrition.sa.ucsc.edu/longmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=40&locationName="
     datePrefix = "&naFlag=1&WeeksMenus=UCSC+-+This+Week%27s+Menus&dtdate="
+    OUTPUT_PATH = "server/src/webscraper/output.html"
     # dates
     
     def __init__(self, location_name: str, meal_num: int, month: int, day: int, year :int):
@@ -232,13 +233,13 @@ class MealScraper():
         """
         headers = self.get_clean_header(self.headerString)
         response_main = requests.get(self.get_main_link(), headers=headers, verify=False, timeout=2)
-        with open("output.html", "w", encoding="utf-8") as f:
+        with open(self.OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(response_main.text)
             print(response_main.headers)
-        with open("output.html", "r", encoding="utf-8") as f:
+        with open(self.OUTPUT_PATH, "r", encoding="utf-8") as f:
             html_string = f.read()
         
-        category_line_nums = self.get_line_nums_of_categories("output.html")
+        category_line_nums = self.get_line_nums_of_categories(self.OUTPUT_PATH)
         
         # regex pattern to pull links from file
         link_pattern = r"'(label\.aspx\?[^']*)\'"
@@ -270,7 +271,7 @@ class MealScraper():
         food_objects = self.convert_nutrition_to_object(names, nutrition_list)
         
         for food in food_objects:
-            food_line_num = self.get_line_num_of_food(food.name, "output.html")
+            food_line_num = self.get_line_num_of_food(food.name, self.OUTPUT_PATH)
             self.append_food_to_category(category_line_nums, food=food, food_line_num=food_line_num, category_dict=category_dict)
             
         # writes results to json file
