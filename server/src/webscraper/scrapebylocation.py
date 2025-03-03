@@ -13,8 +13,12 @@ from tqdm import tqdm
 class ScrapeByLocation:
     
     OUTPUT_PATH = "server/src/webscraper/meal_output.html"
-    def __init__(self):
-        pass
+    def __init__(self, location_name: str,year: str, month: str, day: str):
+        self.location_name = location_name
+        self.year = year
+        self.month = month
+        self.day = day
+        self.output_json_path = "server/src/webscraper/" + self.location_name + "_" + self.get_api_date() + ".json"
     
     
     headerString = """
@@ -42,18 +46,39 @@ class ScrapeByLocation:
         headers = {x[0].strip():x[1].strip() for x in header_list}
         return headers
 
+    def get_date_link(self):
+        return self.month + "%2f" + self.day + "%2f" + self.year
+    
+    def convert_api_location_to_url(self):
+        conversion_table = {"jrlc9-dh": "John+R.+Lewis+%26+College+Nine+Dining+Hall"}
+        return conversion_table[self.location_name]
+    
+    def get_api_date(self):
+        month_string = self.month
+        day_string = self.day
+        year_string = self.year
+        if len(month_string) == 1:
+            month_string = "0" + month_string
+        if len(day_string) == 1:
+            day_string = "0" + day_string
+        return year_string + "-" + month_string + "-" + day_string
+        
+    
     def scrape_meals(self):
         headers = self.get_clean_header(self.headerString)
-        response = requests.get("https://nutrition.sa.ucsc.edu/shortmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=40&locationName=John+R.+Lewis+%26+College+Nine+Dining+Hall&naFlag=1",
+        print(self.get_date_link())
+        response = requests.get("https://nutrition.sa.ucsc.edu/shortmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=40&locationName=John+R.+Lewis+%26+College+Nine+Dining+Hall&naFlag=1&WeeksMenus=UCSC+-+This+Week%27s+Menus&myaction=read&dtdate=" + self.get_date_link(),
                      headers=headers,
                      verify=False,
                      timeout=2)
         with open(self.OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(response.text)
             print(response.headers)
-
+        meals = {"meals": re.findall("shortmenumeals\">([^<]*)", response.text)}
+        with open(self.output_json_path, "w", encoding="utf-8") as f:
+            json.dump(meals, f)
 
 if __name__ == "__main__":
-    scraper = ScrapeByLocation()
+    scraper = ScrapeByLocation(location_name="jrlc9-dh", year="2025", month="3", day="8")
     scraper.scrape_meals()
     
