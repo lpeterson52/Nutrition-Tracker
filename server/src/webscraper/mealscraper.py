@@ -32,6 +32,9 @@ class MealScraper():
         "UCen Bistro": ["Menu"],
         "Stevenson Coffee House": ["Menu"]}
         self.meal = self.mealsByLocation[location_name][meal_num] # gets inputted meal
+        self.month = month
+        self.day = day
+        self.year = year
         self.monthString = str(month) + "%2f" # gets month
         self.dayString = str(day) + "%2f" # gets day
         self.yearString = str(year) + "&mealName=" # gets year
@@ -117,6 +120,20 @@ class MealScraper():
                 formatted_name = '>' + food_name + '<'
                 if formatted_name in line: 
                     return(line_number)
+    
+    def get_api_date(self):
+        """Returns the date passed into the webscraper in the standardized API format"""
+        month_string = str(self.month)
+        day_string = str(self.day)
+        year_string = str(self.year)
+        if self.month < 10:
+            month_string = "0" + month_string
+        if self.day < 10:
+            day_string = "0" + day_string
+        if self.year < 10:
+            year_string = "0" + year_string
+            
+        return year_string + "-" + month_string + "-" + day_string
     
     def create_category_dict(self, line_num_dict: dict):
         """Creates a dictionary where the keys are the categories of food and 
@@ -210,6 +227,22 @@ class MealScraper():
             for food in food_dict[category]:
                 json_dumpable[category].append(food.dict_form)
         return json_dumpable
+    
+    def get_location_api_format(self):
+        """Converts the long form of the given location name to a string that can be passed into the api"""
+        
+        conversion_table = {"John R. Lewis Dining Hall & College Nine Dining Hall": "jrlc9-dh",
+        "Cowell & Stevenson Dining Hall": "cs-dh",
+        "Crown & Merrill Dining Hall and Banana Joe's": "cs-dh",
+        "Porter & Kresge Dining Hall": "pk-dh",
+        "Rachel Carson & Oakes Dining Hall": "rcco_dh",
+        "Oakes Cafe": "o-c",
+        "Global Village Cafe": "gv-c",
+        "Owl's Nest Cafe": "on-c",
+        "Slug Stop": "ss",
+        "UCen Bistro": "uc-b",
+        "Stevenson Coffee House": "sch"}
+        return conversion_table[self.location_name]
 
 
     # returns dictionary of macronutrients and the amount of said macronutrient
@@ -274,5 +307,5 @@ class MealScraper():
             self.append_food_to_category(category_line_nums, food=food, food_line_num=food_line_num, category_dict=category_dict)
             
         # writes results to json file
-        with open("nutritionInfo.json", "w", encoding="utf-8") as f:
+        with open("server/src/webscraper/" + self.get_location_api_format() + "_" + self.get_api_date() + "_" + self.meal.lower() + ".json", "w", encoding="utf-8") as f:
             json.dump(self.convert_food_dict_to_json_dumpable(category_dict, category_line_nums), f, indent=4)

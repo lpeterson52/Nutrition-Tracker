@@ -7,9 +7,9 @@ def main():
     """Main method"""
 
     scraper = mealscraper.MealScraper(location_name="John R. Lewis Dining Hall & College Nine Dining Hall", 
-                                      meal_num=2, 
-                                      month=2, 
-                                      day=25, 
+                                      meal_num=1, 
+                                      month=3, 
+                                      day=2, 
                                       year=2025)
     scraper.scrape_nutrition()
 
