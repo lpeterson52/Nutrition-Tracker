@@ -25,3 +25,9 @@ def read_categories(dining_hall_name: str, date: str, meal :str):
     category_list = [category for category in meal_info]
     return category_list
 
+@app.get("/{dining_hall_name}_{date}_{meal}")
+def read_meal(dining_hall_name: str, date: str, meal :str):
+    with open(dining_hall_name + "_" + date + "_" + meal + ".json", "r", encoding="utf-8") as f:
+        meal_info = json.load(f)
+    return meal_info
+
