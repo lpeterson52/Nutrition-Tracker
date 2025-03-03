@@ -4,3 +4,4 @@ output.html
 __pycache__
 .venv
 *.json
+meal_output.html
