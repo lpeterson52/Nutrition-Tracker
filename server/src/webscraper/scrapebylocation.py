@@ -74,7 +74,7 @@ class ScrapeByLocation:
         with open(self.OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(response.text)
             print(response.headers)
-        meals = {"meals": re.findall("shortmenumeals\">([^<]*)", response.text)}
+        meals = {"meals": re.findall(r"shortmenumeals\">([^<]*)", response.text)}
         with open(self.output_json_path, "w", encoding="utf-8") as f:
             json.dump(meals, f)
 
